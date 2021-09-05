@@ -1,7 +1,7 @@
 import json
 
 
-CONFIG_VERSION_KEY = "config_version"
+DEFAULT_CONFIG_VERSION_KEY = "config_version"
 
 
 class ObjectNotSerializableError(Exception):
@@ -34,7 +34,7 @@ class VersionedConfigMigration(object):
         """
         :param from_version: version to migrate from
         :param to_version: version to migrate to
-        :param migrate_func: function to do the migration
+        :param callable migrate_func: function to do the migration
         """
         self.from_version = from_version
         self.to_version = to_version
@@ -89,18 +89,46 @@ class VersionedConfigObject(object):
         """
         curr_version = old_version
 
-        for m in self._migrations:
-            if m.from_version == curr_version:
-                attrs = m.migrate(attrs)
-                curr_version = m.to_version
+        if hasattr(self, '_migrations'):
+            for m in self._migrations:
+                if m.from_version == curr_version:
+                    attrs = m.migrate(attrs)
+                    curr_version = m.to_version
 
-        if curr_version != target_version:
-            raise VersionedConfigMigrationError("Failed to migrate %s from version %s to version %s" %
-                                                (self.__class__.__name__, old_version, target_version))
+            if curr_version == target_version:
+                # Success
+                return
+
+        raise VersionedConfigMigrationError("Failed to migrate %s from version %s to version %s" %
+                                            (self.__class__.__name__, old_version, target_version))
+
+    @property
+    def config_version_key(self) -> str:
+        """
+        Return the string to be used for the key of the version field in this confib object
+        """
+        if hasattr(self, '_config_version_key'):
+            return self._config_version_key
+
+        return DEFAULT_CONFIG_VERSION_KEY
+
+    @config_version_key.setter
+    def config_version_key(self, value: str):
+        """
+        Set the string to be used for the key of the version field in this config object
+
+        :param str value: String to be used for version key
+        """
+        setattr(self, '_config_version_key', value)
 
     def to_json_serializable(self) -> dict:
         """
         Convert this config object's instance variables to a JSON-serializable dict
+
+        :raise ObjectNotSerializableError: if object cannot be serialized
+        :raise ValueError: if a reserved name was used as an instance variable name
+
+        :return: dict suitable for passing to json.dump
         """
         attrs = {}
         for n in self._instance_varname_generator():
@@ -120,10 +148,10 @@ class VersionedConfigObject(object):
 
         # Check if this class is versioned
         if self.__class__.VERSION is not None :
-            if CONFIG_VERSION_KEY in attrs:
+            if self.config_version_key in attrs:
                 raise ValueError("Cannot have an attribute with name '%s', name is reserved" % n)
 
-            attrs[CONFIG_VERSION_KEY] = self.__class__.VERSION
+            attrs[self.config_version_key] = self.__class__.VERSION
 
         return attrs
 
@@ -132,14 +160,18 @@ class VersionedConfigObject(object):
         Load new values into this config object's instance variables, from a JSON-serializable dict
 
         :param attrs: JSON-serializable dict to load from
+
+        :raise VersionedConfigMigrationError: if an older config object can't be migrated to the current version
+        :raise InvalidFieldName: if config data contains a field name not present in class
+        :raise ObjectNotSerializableError: if object cannot be de-serialized
         """
         # Is this class versioned?
-        if CONFIG_VERSION_KEY in attrs:
+        if self.config_version_key in attrs:
             # Do the versions match?
-            if attrs[CONFIG_VERSION_KEY] != self.__class__.VERSION:
-                self._migrate(attrs, attrs[CONFIG_VERSION_KEY], self.__class__.VERSION)
+            if attrs[self.config_version_key] != self.__class__.VERSION:
+                self._migrate(attrs, attrs[self.config_version_key], self.__class__.VERSION)
 
-            del attrs[CONFIG_VERSION_KEY]
+            del attrs[self.config_version_key]
 
         # Migration successful, or not needed
         for n in attrs:
@@ -201,7 +233,7 @@ class VersionedConfigObject(object):
 
     def loads(self, s, **kwargs):
         """
-        Populate this config object from a striong containing JSON data
+        Populate this config object from a string containing JSON data
 
         :param s: string to read JSON data from
         :param kwargs: accepts same kwargs as json.loads function
