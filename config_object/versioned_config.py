@@ -59,7 +59,7 @@ class VersionedConfigObject(object):
         :param obj: object to check
         :return: True if object is builtin serializable type
         """
-        return type(obj) in [int, float, bool, str, list]
+        return type(obj) in [int, float, bool, str, list, dict]
 
     def _is_instance_var(self, attrname: str) -> bool:
         """
