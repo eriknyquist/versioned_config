@@ -11,7 +11,9 @@ variables that are not callables, and do not begin with ``_``) are treated as ke
 pairs in a JSON object. ``VersionedConfigObject`` instances can also be nested, i.e.
 the value of an instance variable can be another ``VersionedConfigObject instance``:
 
-*Example of defining serializable object classes* ::
+*Example of defining a new serializable object structure*:
+
+.. code-block:: python
 
     from config_object import VersionedConfigObject
 
@@ -32,7 +34,9 @@ the value of an instance variable can be another ``VersionedConfigObject instanc
 Serializing/deserializing a ``VersionedConfigObject`` instance
 --------------------------------------------------------------
 
-*Example of instantiating/serializing/deserializing custom object* ::
+*Example of instantiating/serializing/deserializing custom object*:
+
+.. code-block:: python
 
    >>> config = MyConfig2()                       # Create instance of the MyConfig2 class defined above
    >>> config.var1 = 99.8                         # Modify some values
@@ -71,10 +75,12 @@ Versioned objects
 
 Serializable objects can be versioned by setting the ``VERSION`` class variable
 on a ``VersionedConfigObject`` subclass. Migration functions can be added so that
-when JSON data with an older version is encountered, it can be migrated to the newest
+when JSON data with an older version is loaded, it can be migrated to the newest
 version.
 
-*Example of defining a versioned object class* ::
+*Example of defining a versioned object class*:
+
+.. code-block:: python
 
     from config_object import VersionedConfigObject
 
@@ -90,12 +96,14 @@ Migrations
 
 Now, imagine a situation where you have already released software that saves/loads data using
 the ``MyVersionedConfig`` class. In an upcoming new release, you need to change the format
-of ``MyVersionedConfig``, but of course you don't want to break any JSON files that users
-may already have on their systems with the update. This is where migrations come in. For each
+of ``MyVersionedConfig``, but of course you don't want your update to break any JSON files
+that users may already have on their systems. This is where migrations are useful. For each
 new release that changes the format of ``MyVersionedConfig``, you can define a migration
-function that modifies the object structure to conform to the new format.
+function that modifies the object structure to conform to the new object structure.
 
-*Example of adding a migration function to the same class* ::
+*Example of adding a migration function to the same class*:
+
+.. code-block:: python
 
     from config_object import VersionedConfigObject
 
@@ -121,7 +129,9 @@ function that modifies the object structure to conform to the new format.
 For further releases, add more migration functions if needed (make sure migration
 functions are added in the correct order):
 
-*Example of adding another migration function to the same class* ::
+*Example of adding another migration function to the same class*:
+
+.. code-block:: python
 
     from config_object import VersionedConfigObject
 
@@ -149,3 +159,6 @@ functions are added in the correct order):
             attrs['var4']
 
             return attrs
+
+.. note:: any added migrations will be automatically performed, if needed, by the
+          ``load()``, ``loads()`` and ``from_json_serializable()`` methods.
