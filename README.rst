@@ -1,17 +1,17 @@
-Python library for safe JSON-serializable objects
-#################################################
+Python library for creating and managing versioned configuration files
+######################################################################
 
 
-Defining serializable object structure
---------------------------------------
+Defining configuration file structure
+-------------------------------------
 
-To create a new JSON-serializable object, define a new class that is a subclass of
+To create a new configuration file, define a new class that is a subclass of
 ``VersionedConfigObject``. Instance variables of a ``VersionedConfigObject`` (any instance
 variables that are not callables, and do not begin with ``_``) are treated as key-value
 pairs in a JSON object. ``VersionedConfigObject`` instances can also be nested, i.e.
 the value of an instance variable can be another ``VersionedConfigObject instance``:
 
-*Example of defining a new serializable object structure*:
+*Example of defining a new configuration file structure*:
 
 .. code-block:: python
 
@@ -34,7 +34,7 @@ the value of an instance variable can be another ``VersionedConfigObject instanc
 Serializing/deserializing a ``VersionedConfigObject`` instance
 --------------------------------------------------------------
 
-*Example of instantiating/serializing/deserializing custom object*:
+*Example of instantiating/serializing/deserializing configuration object*:
 
 .. code-block:: python
 
@@ -67,18 +67,18 @@ Serializing/deserializing a ``VersionedConfigObject`` instance
    >>>     config.load(fh)
    >>>
 
-Versioned serializable objects and migrations
----------------------------------------------
+Versioned configuration files and migrations
+--------------------------------------------
 
-Versioned objects
-=================
+Versioned configuration files
+=============================
 
-Serializable objects can be versioned by setting the ``VERSION`` class variable
+Configuration files can be versioned by setting the ``VERSION`` class variable
 on a ``VersionedConfigObject`` subclass. Migration functions can be added so that
 when JSON data with an older version is loaded, it can be migrated to the newest
 version.
 
-*Example of defining a versioned object class*:
+*Example of defining a versioned configuration object*:
 
 .. code-block:: python
 

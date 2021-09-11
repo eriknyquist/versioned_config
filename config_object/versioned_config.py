@@ -104,7 +104,7 @@ class VersionedConfigObject(object):
         """
         setattr(self, '_config_version_key', value)
 
-    def to_json_serializable(self) -> dict:
+    def to_json_serializable(self) -> object:
         """
         Convert this config object's instance variables to a JSON-serializable dict
 
@@ -138,7 +138,7 @@ class VersionedConfigObject(object):
 
         return attrs
 
-    def from_json_serializable(self, attrs: dict):
+    def from_json_serializable(self, attrs: object):
         """
         Load new values into this config object's instance variables, from a JSON-serializable dict
 

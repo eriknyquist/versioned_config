@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from config_object import VersionedConfigObject
@@ -121,6 +122,62 @@ class TestVersionedConfig(unittest.TestCase):
         d = c.to_json_serializable()
         self.assertEqual(len(d), 1)
         self.assertEqual(d['v1'], 123)
+
+    def test_unversioned_dumps_loads(self):
+        class C1(VersionedConfigObject):
+            def __init__(self):
+                self.v1 = 0.0
+                self.v2 = 0.0
+
+        class C2(VersionedConfigObject):
+            def __init__(self):
+                self.v1 = 0.0
+                self.v2 = C1()
+
+        ca = C2()
+        ca.v1 = 11.11
+        ca.v2.v1 = 22.22
+        ca.v2.v2 = 33.33
+
+        s = ca.dumps()
+        self.assertEqual('{"v1": 11.11, "v2": {"v1": 22.22, "v2": 33.33}}', s)
+
+        cb = C2()
+        cb.loads(s)
+        self.assertEqual(11.11, cb.v1)
+        self.assertEqual(22.22, cb.v2.v1)
+        self.assertEqual(33.33, cb.v2.v2)
+
+    def test_unversioned_dump_load(self):
+        class C1(VersionedConfigObject):
+            def __init__(self):
+                self.v1 = 0.0
+                self.v2 = 0.0
+
+        class C2(VersionedConfigObject):
+            def __init__(self):
+                self.v1 = 0.0
+                self.v2 = C1()
+
+        ca = C2()
+        ca.v1 = 11.11
+        ca.v2.v1 = 22.22
+        ca.v2.v2 = 33.33
+
+        filename = '.config_object_test_file.json'
+        with open(filename, 'w') as fh:
+            s = ca.dump(fh)
+
+        cb = C2()
+
+        with open(filename, 'r') as fh:
+            cb.load(fh)
+
+        self.assertEqual(11.11, cb.v1)
+        self.assertEqual(22.22, cb.v2.v1)
+        self.assertEqual(33.33, cb.v2.v2)
+
+        os.remove(filename)
 
     def test_versioned_config_no_migrations_available(self):
         class VC1(VersionedConfigObject):
