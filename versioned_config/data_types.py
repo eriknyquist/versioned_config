@@ -1,6 +1,6 @@
 import base64
 
-from config_object.versioned_config import VersionedConfigObject
+from versioned_config import VersionedConfigObject
 
 
 class BinaryBlob(VersionedConfigObject):

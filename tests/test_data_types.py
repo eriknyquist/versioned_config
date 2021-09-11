@@ -1,7 +1,7 @@
 import unittest
 
-from config_object.versioned_config import VersionedConfigObject
-from config_object.data_types import BinaryBlob
+from versioned_config import VersionedConfigObject
+from versioned_config.data_types import BinaryBlob
 
 
 class TestDataTypes(unittest.TestCase):

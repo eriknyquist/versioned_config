@@ -1,8 +1,13 @@
+__author__ = "Erik Nyquist"
+__license__ = "Apache 2.0"
+__version__ = "0.5.0"
+__maintainer__ = "Erik Nyquist"
+__email__ = "eknyquist@gmail.com"
+
+
 import json
 
-from config_object.exceptions import (
-        ObjectNotSerializableError, InvalidFieldName, VersionedConfigMigrationError
-)
+from versioned_config.exceptions import ObjectNotSerializableError, InvalidFieldName, VersionedConfigMigrationError
 
 
 DEFAULT_CONFIG_VERSION_KEY = "config_version"

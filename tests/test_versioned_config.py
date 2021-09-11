@@ -1,8 +1,8 @@
 import os
 import unittest
 
-from config_object import VersionedConfigObject
-from config_object import ObjectNotSerializableError, InvalidFieldName, VersionedConfigMigrationError
+from versioned_config import VersionedConfigObject
+from versioned_config import ObjectNotSerializableError, InvalidFieldName, VersionedConfigMigrationError
 
 
 # Test with a child class of VersionedConfigObject
